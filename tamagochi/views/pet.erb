@@ -1,0 +1,21 @@
+<body>
+<p>Your pet:</p>
+<hr>
+<p>Status: <%=@@pet.tohtml%></p>
+
+<form method="POST" action="/hp">
+  <p>Visit doctor: <input type="submit"></p>
+</form>
+<form method="POST" action="/eat">
+  <p>Feed <%=@@pet_name%>: <input type="submit"></p>
+</form>
+<form method="POST" action="/play">
+  <p>Play with <%=@@pet_name%>: <input type ="submit"></p>
+</form>
+<form method="POST" action="/sleep">
+  <p>Put to sleep <%=@@pet_name%>: <input type="submit"></p>
+</form>
+<form method="POST" action="/training">
+  <p>Train  <%=@@pet_name%>: <input type="submit"></p>
+</form>
+</body>
