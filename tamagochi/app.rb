@@ -1,7 +1,6 @@
 require 'sinatra'
 require "sinatra/reloader" if development?
 require "yaml"
-require "/home/vyacheslav/Рабочий стол/tamgem/TamGem/lib/TamGem.rb"
 
 class Tomagochi
 
@@ -123,8 +122,49 @@ class Tomagochi
     @stats = "
 Type: #{@type} \nName: #{@name} \nHp: #{@hp}/10 \nHungry: #{@hungry}/10 \nMood: #{@mood}/10 \nSleep: #{@sleep}/10 \nWallking: #{@wallking}/10 \nTraining: #{@training}/10"
   end
+  def update_database
+    f = File.open("database.yml", "w")
+    params_hash = {"Type":@type, "Name":@name, "Hp":@hp, "Hungry":@hungry, "Mood":@mood, "Sleep":@sleep, "Wallking":@walking, "Training":@training}
+    f.write(params_hash.to_yaml)
+    f.close
+  end
+  private
+def newday
+  @newday += 1
+  if @newday % 2 == 0
+    @hp -= 1
+    @hungry -= 1
+    @mood -= 1
+    @sleep -= 1
+    @wallking -= 1
+    @training -= 1
+  elsif @newday % 5 == 0
+    @hp += 1
+    @hungry += 1
+    @mood += 1
+    @sleep += 1
+    @wallking += 1
+    @training += 1
+  elsif @newday % 9 == 0
+    @hp -= 1
+    @hungry -= 1
+    @mood -= 1
+    @sleep -= 1
+    @wallking -= 1
+    @training -= 1
+  elsif @newday % 50 == 0
+    @hp += 1
+    @hungry += 1
+    @mood += 1
+    @sleep += 1
+    @wallking += 1
+    @training += 1
+  elsif @newday % 21 == 0
+    @training += 1
+    @mood += 1
+  end
 end
-
+end
 get '/' do
   erb :pet_create
 end
@@ -137,6 +177,7 @@ post '/pet_created' do
 end
 
 get '/pet' do
+  @@pet.update_database
   if @@pet.gameover
     redirect to '/pet_die'
   end
@@ -171,8 +212,10 @@ post '/training' do
   @@pet.training
   erb :training
 end
-post 'skil_time' do
-  @@pet.
+post '/skip_time' do
+  @@pet.send(:newday)
+  erb :skip_time
+end
 get '/pet_die' do
   erb :pet_die
 end
