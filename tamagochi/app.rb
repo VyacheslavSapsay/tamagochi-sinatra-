@@ -1,11 +1,11 @@
+# frozen_string_literal: true
+
 require 'sinatra'
-require "sinatra/reloader" if development?
-require "yaml"
+require 'sinatra/reloader' if development?
+require 'yaml'
 
 class Tomagochi
-
   attr_accessor :type, :name, :hp, :hungry, :mood, :sleep, :wallking, :training, :newday
-
 
   def initialize(type, name, hp, hungry, mood, sleep, wallking, training, newday)
     @type = type
@@ -20,16 +20,15 @@ class Tomagochi
   end
 
   def gameover
-      @hp <= 0 || @hungry <= 0 || @mood <= 0 || @sleep <= 0 || @wallking <= 0 || @training <= 0
+    @hp <= 0 || @hungry <= 0 || @mood <= 0 || @sleep <= 0 || @wallking <= 0 || @training <= 0
   end
-
 
   def checking
     if @hp > 10
       @hp = 10
     elsif @hungry > 10
       @hungry = 10
-    elsif @mood >10
+    elsif @mood > 10
       @mood = 10
     elsif @sleep > 10
       @sleep = 10
@@ -39,7 +38,6 @@ class Tomagochi
       @training = 10
     end
   end
-
 
   def hp
     @hp += 1
@@ -51,12 +49,12 @@ class Tomagochi
   end
 
   def eating
-    if @hungry <10
+    if @hungry < 10
       @hungry += 1
       @mood += 1
       @sleep -= 1
-      @wallking -=1
-      @training -=1
+      @wallking -= 1
+      @training -= 1
     else
       puts "I'm not hungry"
     end
@@ -67,7 +65,7 @@ class Tomagochi
       @play += 1
       @mood += 1
       @sleep -= 1
-      @wallking -=1
+      @wallking -= 1
     else
       puts "I don't want to play"
     end
@@ -122,48 +120,62 @@ class Tomagochi
     @stats = "
 Type: #{@type} \nName: #{@name} \nHp: #{@hp}/10 \nHungry: #{@hungry}/10 \nMood: #{@mood}/10 \nSleep: #{@sleep}/10 \nWallking: #{@wallking}/10 \nTraining: #{@training}/10"
   end
+
   def update_database
-    f = File.open("database.yml", "w")
-    params_hash = {"Type":@type, "Name":@name, "Hp":@hp, "Hungry":@hungry, "Mood":@mood, "Sleep":@sleep, "Wallking":@walking, "Training":@training}
+    f = File.open('database.yml', 'w')
+    params_hash = { "Type": @type, "Name": @name, "Hp": @hp, "Hungry": @hungry, "Mood": @mood, "Sleep": @sleep, "Wallking": @walking, "Training": @training }
     f.write(params_hash.to_yaml)
     f.close
   end
-  private
-def newday
-  @newday += 1
-  if @newday % 2 == 0
-    @hp -= 1
-    @hungry -= 1
-    @mood -= 1
-    @sleep -= 1
-    @wallking -= 1
-    @training -= 1
-  elsif @newday % 5 == 0
-    @hp += 1
-    @hungry += 1
-    @mood += 1
-    @sleep += 1
-    @wallking += 1
-    @training += 1
-  elsif @newday % 9 == 0
-    @hp -= 1
-    @hungry -= 1
-    @mood -= 1
-    @sleep -= 1
-    @wallking -= 1
-    @training -= 1
-  elsif @newday % 50 == 0
-    @hp += 1
-    @hungry += 1
-    @mood += 1
-    @sleep += 1
-    @wallking += 1
-    @training += 1
-  elsif @newday % 21 == 0
-    @training += 1
-    @mood += 1
+
+  def delete
+    @hp = 0
+    @hungry = 0
+    @mood = 0
+    @sleep = 0
+    @wallking = 0
+    @training = 0
+    @newday = 0
+    update_database
   end
-end
+
+  private
+
+  def newday
+    @newday += 1
+    if @newday.even?
+      @hp -= 1
+      @hungry -= 1
+      @mood -= 1
+      @sleep -= 1
+      @wallking -= 1
+      @training -= 1
+    elsif @newday % 5 == 0
+      @hp += 1
+      @hungry += 1
+      @mood += 1
+      @sleep += 1
+      @wallking += 1
+      @training += 1
+    elsif @newday % 9 == 0
+      @hp -= 1
+      @hungry -= 1
+      @mood -= 1
+      @sleep -= 1
+      @wallking -= 1
+      @training -= 1
+    elsif @newday % 50 == 0
+      @hp += 1
+      @hungry += 1
+      @mood += 1
+      @sleep += 1
+      @wallking += 1
+      @training += 1
+    elsif @newday % 21 == 0
+      @training += 1
+      @mood += 1
+    end
+  end
 end
 get '/' do
   erb :pet_create
@@ -178,16 +190,14 @@ end
 
 get '/pet' do
   @@pet.update_database
-  if @@pet.gameover
-    redirect to '/pet_die'
-  end
+  redirect to '/pet_die' if @@pet.gameover
   @@pet.checking
-    erb :pet
+  erb :pet
 end
 
 post '/eat' do
   @@pet.eating
-    erb :eat
+  erb :eat
 end
 
 post '/hp' do
@@ -201,8 +211,8 @@ post '/play' do
 end
 
 post '/sleep' do
-    @@pet.sleep
-    erb :sleep
+  @@pet.sleep
+  erb :sleep
 end
 post '/wallking' do
   @@pet.wallking
@@ -218,4 +228,13 @@ post '/skip_time' do
 end
 get '/pet_die' do
   erb :pet_die
+end
+
+post '/pet_delete_confirm' do
+  erb :pet_delete_confirm
+end
+
+post '/pet_delete' do
+  @@pet.delete
+  erb :pet_delete
 end
