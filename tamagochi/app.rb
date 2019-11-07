@@ -220,7 +220,7 @@ post '/wallking' do
 end
 post '/training' do
   @@pet.training
-  erb :training
+  erb :train
 end
 post '/skip_time' do
   @@pet.send(:newday)
